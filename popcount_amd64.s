@@ -48,7 +48,7 @@ bigloop:
 	JZ ret
 
 	CMPQ BX, $32
-	JGE bigloop
+	JAE bigloop
 
 	CMPQ BX, $8
 	JB tail
@@ -62,7 +62,7 @@ loop:
 	JZ ret
 
 	CMPQ BX, $8
-	JGE loop
+	JAE loop
 
 tail:
 	XORQ DX, DX
