@@ -10,7 +10,7 @@
 // func countBytesASM(data *byte, len uint64) uint64
 TEXT ·countBytesASM(SB),NOSPLIT,$0
 	MOVQ data+0(FP), SI
-	MOVQ len+8(FP), CX
+	MOVQ len+8(FP), BX
 
 	/*
 	 * Important performance information can be found at:
@@ -27,70 +27,70 @@ TEXT ·countBytesASM(SB),NOSPLIT,$0
 
 	XORQ AX, AX
 
-	CMPQ CX, $8
+	CMPQ BX, $8
 	JB tail
 
-	CMPQ CX, $32
+	CMPQ BX, $32
 	JB loop
 
 bigloop:
-	POPCNTQ -8(SI)(CX*1), R11
-	POPCNTQ -16(SI)(CX*1), R10
-	POPCNTQ -24(SI)(CX*1), R9
-	POPCNTQ -32(SI)(CX*1), R8
+	POPCNTQ -8(SI)(BX*1), R11
+	POPCNTQ -16(SI)(BX*1), R10
+	POPCNTQ -24(SI)(BX*1), R9
+	POPCNTQ -32(SI)(BX*1), R8
 
 	ADDQ R11, AX
 	ADDQ R10, AX
 	ADDQ R9, AX
 	ADDQ R8, AX
 
-	SUBQ $32, CX
+	SUBQ $32, BX
 	JZ ret
 
-	CMPQ CX, $32
+	CMPQ BX, $32
 	JGE bigloop
 
-	CMPQ CX, $8
+	CMPQ BX, $8
 	JB tail
 
 loop:
 	XORQ DX, DX
-	POPCNTQ -8(SI)(CX*1), DX
+	POPCNTQ -8(SI)(BX*1), DX
 	ADDQ DX, AX
 
-	SUBQ $8, CX
+	SUBQ $8, BX
 	JZ ret
 
-	CMPQ CX, $8
+	CMPQ BX, $8
 	JGE loop
 
 tail:
 	XORQ DX, DX
 
-	CMPQ CX, $4
+	CMPQ BX, $4
 	JB tail_2
 
-	MOVL -4(SI)(CX*1), DX
+	MOVL -4(SI)(BX*1), DX
 
-	SUBQ $4, CX
+	SUBQ $4, BX
 	JZ tail_4
 
 tail_2:
-	CMPQ CX, $2
+	CMPQ BX, $2
 	JB tail_3
 
 	SHLQ $16, DX
-	ORW -2(SI)(CX*1), DX
+	ORW -2(SI)(BX*1), DX
 
-	SUBQ $2, CX
+	SUBQ $2, BX
 	JZ tail_4
 
 tail_3:
-	TESTQ CX, CX
+	TESTQ BX, BX
 	JZ tail_4
 
 	SHLQ $8, DX
-	ORB -1(SI)(CX*1), DX
+	ORB -1(SI)(BX*1), DX
 
 tail_4:
 	POPCNTQ DX, DX
