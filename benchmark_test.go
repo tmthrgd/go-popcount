@@ -10,208 +10,97 @@ import (
 	"testing"
 )
 
+type size struct {
+	name string
+	l    int
+}
+
+var sizes = []size{
+	{"32", 32},
+	{"128", 128},
+	{"1K", 1 * 1024},
+	{"16K", 16 * 1024},
+	{"128K", 128 * 1024},
+	{"1M", 1024 * 1024},
+	{"16M", 16 * 1024 * 1024},
+	{"128M", 128 * 1024 * 1024},
+	{"512M", 512 * 1024 * 1024},
+}
+
 func randRead64(s []uint64) {
 	for i := range s {
 		s[i] = uint64(rand.Int63())
 	}
 }
 
-func benchmarkCountBytes(b *testing.B, l int) {
+func BenchmarkCountBytes(b *testing.B) {
 	if !usePOPCNT {
 		b.Log("does not have POPCNT instruction")
 	}
 
-	s := make([]byte, l)
-	rand.Read(s)
+	for _, size := range sizes {
+		b.Run(size.name, func(b *testing.B) {
+			s := make([]byte, size.l)
+			rand.Read(s)
 
-	b.SetBytes(int64(l))
-	b.ResetTimer()
+			b.SetBytes(int64(size.l))
+			b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
-		CountBytes(s)
+			for i := 0; i < b.N; i++ {
+				CountBytes(s)
+			}
+		})
 	}
 }
 
-func BenchmarkCountBytes_32(b *testing.B) {
-	benchmarkCountBytes(b, 32)
-}
-
-func BenchmarkCountBytes_128(b *testing.B) {
-	benchmarkCountBytes(b, 128)
-}
-
-func BenchmarkCountBytes_1k(b *testing.B) {
-	benchmarkCountBytes(b, 1*1024)
-}
-
-func BenchmarkCountBytes_16k(b *testing.B) {
-	benchmarkCountBytes(b, 16*1024)
-}
-
-func BenchmarkCountBytes_128k(b *testing.B) {
-	benchmarkCountBytes(b, 128*1024)
-}
-
-func BenchmarkCountBytes_1M(b *testing.B) {
-	benchmarkCountBytes(b, 1024*1024)
-}
-
-func BenchmarkCountBytes_16M(b *testing.B) {
-	benchmarkCountBytes(b, 16*1024*1024)
-}
-
-func BenchmarkCountBytes_128M(b *testing.B) {
-	benchmarkCountBytes(b, 128*1024*1024)
-}
-
-func BenchmarkCountBytes_512M(b *testing.B) {
-	benchmarkCountBytes(b, 512*1024*1024)
-}
-
-func benchmarkCountSlice64(b *testing.B, l int) {
+func BenchmarkCountSlice64(b *testing.B) {
 	if !usePOPCNT {
 		b.Log("does not have POPCNT instruction")
 	}
 
-	s := make([]uint64, l/8)
-	randRead64(s)
+	for _, size := range sizes {
+		b.Run(size.name, func(b *testing.B) {
+			s := make([]uint64, size.l/8)
+			randRead64(s)
 
-	b.SetBytes(int64(l))
-	b.ResetTimer()
+			b.SetBytes(int64(size.l))
+			b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
-		CountSlice64(s)
+			for i := 0; i < b.N; i++ {
+				CountSlice64(s)
+			}
+		})
 	}
 }
 
-func BenchmarkCountSlice64_32(b *testing.B) {
-	benchmarkCountSlice64(b, 32)
-}
+func BenchmarkCountBytesGo(b *testing.B) {
+	for _, size := range sizes {
+		b.Run(size.name, func(b *testing.B) {
+			s := make([]byte, size.l)
+			rand.Read(s)
 
-func BenchmarkCountSlice64_128(b *testing.B) {
-	benchmarkCountSlice64(b, 128)
-}
+			b.SetBytes(int64(size.l))
+			b.ResetTimer()
 
-func BenchmarkCountSlice64_1k(b *testing.B) {
-	benchmarkCountSlice64(b, 1*1024)
-}
-
-func BenchmarkCountSlice64_16k(b *testing.B) {
-	benchmarkCountSlice64(b, 16*1024)
-}
-
-func BenchmarkCountSlice64_128k(b *testing.B) {
-	benchmarkCountSlice64(b, 128*1024)
-}
-
-func BenchmarkCountSlice64_1M(b *testing.B) {
-	benchmarkCountSlice64(b, 1024*1024)
-}
-
-func BenchmarkCountSlice64_16M(b *testing.B) {
-	benchmarkCountSlice64(b, 16*1024*1024)
-}
-
-func BenchmarkCountSlice64_128M(b *testing.B) {
-	benchmarkCountSlice64(b, 128*1024*1024)
-}
-
-func BenchmarkCountSlice64_512M(b *testing.B) {
-	benchmarkCountSlice64(b, 512*1024*1024)
-}
-
-func benchmarkCountBytesGo(b *testing.B, l int) {
-	s := make([]byte, l)
-	rand.Read(s)
-
-	b.SetBytes(int64(l))
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		countBytesGo(s)
+			for i := 0; i < b.N; i++ {
+				countBytesGo(s)
+			}
+		})
 	}
 }
 
-func BenchmarkCountBytesGo_32(b *testing.B) {
-	benchmarkCountBytesGo(b, 32)
-}
+func BenchmarkCountSlice64Go(b *testing.B) {
+	for _, size := range sizes {
+		b.Run(size.name, func(b *testing.B) {
+			s := make([]uint64, size.l/8)
+			randRead64(s)
 
-func BenchmarkCountBytesGo_128(b *testing.B) {
-	benchmarkCountBytesGo(b, 128)
-}
+			b.SetBytes(int64(size.l))
+			b.ResetTimer()
 
-func BenchmarkCountBytesGo_1k(b *testing.B) {
-	benchmarkCountBytesGo(b, 1*1024)
-}
-
-func BenchmarkCountBytesGo_16k(b *testing.B) {
-	benchmarkCountBytesGo(b, 16*1024)
-}
-
-func BenchmarkCountBytesGo_128k(b *testing.B) {
-	benchmarkCountBytesGo(b, 128*1024)
-}
-
-func BenchmarkCountBytesGo_1M(b *testing.B) {
-	benchmarkCountBytesGo(b, 1024*1024)
-}
-
-func BenchmarkCountBytesGo_16M(b *testing.B) {
-	benchmarkCountBytesGo(b, 16*1024*1024)
-}
-
-func BenchmarkCountBytesGo_128M(b *testing.B) {
-	benchmarkCountBytesGo(b, 128*1024*1024)
-}
-
-func BenchmarkCountBytesGo_512M(b *testing.B) {
-	benchmarkCountBytesGo(b, 512*1024*1024)
-}
-
-func benchmarkCountSlice64Go(b *testing.B, l int) {
-	s := make([]uint64, l/8)
-	randRead64(s)
-
-	b.SetBytes(int64(l))
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		countSlice64Go(s)
+			for i := 0; i < b.N; i++ {
+				countSlice64Go(s)
+			}
+		})
 	}
-}
-
-func BenchmarkCountSlice64Go_32(b *testing.B) {
-	benchmarkCountSlice64Go(b, 32)
-}
-
-func BenchmarkCountSlice64Go_128(b *testing.B) {
-	benchmarkCountSlice64Go(b, 128)
-}
-
-func BenchmarkCountSlice64Go_1k(b *testing.B) {
-	benchmarkCountSlice64Go(b, 1*1024)
-}
-
-func BenchmarkCountSlice64Go_16k(b *testing.B) {
-	benchmarkCountSlice64Go(b, 16*1024)
-}
-
-func BenchmarkCountSlice64Go_128k(b *testing.B) {
-	benchmarkCountSlice64Go(b, 128*1024)
-}
-
-func BenchmarkCountSlice64Go_1M(b *testing.B) {
-	benchmarkCountSlice64Go(b, 1024*1024)
-}
-
-func BenchmarkCountSlice64Go_16M(b *testing.B) {
-	benchmarkCountSlice64Go(b, 16*1024*1024)
-}
-
-func BenchmarkCountSlice64Go_128M(b *testing.B) {
-	benchmarkCountSlice64Go(b, 128*1024*1024)
-}
-
-func BenchmarkCountSlice64Go_512M(b *testing.B) {
-	benchmarkCountSlice64Go(b, 512*1024*1024)
 }
