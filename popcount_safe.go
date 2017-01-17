@@ -12,7 +12,7 @@ import "encoding/binary"
 func countBytesGo(s []byte) (count uint64) {
 	for i := 0; i+8 <= len(s); i += 8 {
 		x := binary.LittleEndian.Uint64(s[i:])
-		count += popcnt64Go(x)
+		count += Count64(x)
 	}
 
 	s = s[len(s)&^7:]
@@ -33,6 +33,6 @@ func countBytesGo(s []byte) (count uint64) {
 		left = left<<8 | uint64(s[0])
 	}
 
-	count += popcnt64Go(left)
+	count += Count64(left)
 	return
 }

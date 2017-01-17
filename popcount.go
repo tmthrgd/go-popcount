@@ -5,7 +5,8 @@
 // Package popcount is a population count implementation for Golang.
 package popcount
 
-func popcnt64Go(x uint64) uint64 {
+// Count64 function counts the number of non-zero bits in a 64bit unsigned integer.
+func Count64(x uint64) uint64 {
 	x = (x & 0x5555555555555555) + ((x & 0xAAAAAAAAAAAAAAAA) >> 1)
 	x = (x & 0x3333333333333333) + ((x & 0xCCCCCCCCCCCCCCCC) >> 2)
 	x = (x & 0x0F0F0F0F0F0F0F0F) + ((x & 0xF0F0F0F0F0F0F0F0) >> 4)
@@ -15,7 +16,7 @@ func popcnt64Go(x uint64) uint64 {
 
 func countSlice64Go(s []uint64) (count uint64) {
 	for _, x := range s {
-		count += popcnt64Go(x)
+		count += Count64(x)
 	}
 
 	return

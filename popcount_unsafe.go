@@ -42,7 +42,7 @@ func countBytesGo(s []byte) (count uint64) {
 			s = s[1:]
 		}
 
-		count = popcnt64Go(left)
+		count = Count64(left)
 
 		if len(s) < 8 {
 			goto tail
@@ -51,7 +51,7 @@ func countBytesGo(s []byte) (count uint64) {
 
 	s64 = (*[1 << 27]uint64)(unsafe.Pointer(&s[0]))[:len(s)>>3]
 	for _, x := range s64 {
-		count += popcnt64Go(x)
+		count += Count64(x)
 	}
 
 	s = s[len(s)&^7:]
@@ -73,6 +73,6 @@ tail:
 		left = left<<8 | uint64(s[0])
 	}
 
-	count += popcnt64Go(left)
+	count += Count64(left)
 	return
 }
