@@ -63,7 +63,7 @@ func countBytesASM(a *asm.Asm) {
 	a.Label(bigloop)
 
 	for i, r := range []asm.Operand{asm.R11, asm.R10, asm.R9, asm.R8} {
-		a.Popcntq(r, asm.Address(si, cx, asm.SX1, -8*(i + 1)))
+		a.Popcntq(r, asm.Address(si, cx, asm.SX1, -8*(i+1)))
 	}
 
 	for _, r := range []asm.Operand{asm.R11, asm.R10, asm.R9, asm.R8} {
