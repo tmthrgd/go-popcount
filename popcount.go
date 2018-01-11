@@ -6,6 +6,8 @@
 package popcount
 
 // Count64 function counts the number of non-zero bits in a 64bit unsigned integer.
+//
+// Deprecated: use math/bits.OnesCount64 instead.
 func Count64(x uint64) uint64 {
 	x = (x & 0x5555555555555555) + ((x & 0xAAAAAAAAAAAAAAAA) >> 1)
 	x = (x & 0x3333333333333333) + ((x & 0xCCCCCCCCCCCCCCCC) >> 2)
