@@ -7,12 +7,15 @@
 
 package popcount
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"math/bits"
+)
 
 func countBytesGo(s []byte) (count uint64) {
 	for i := 0; i+8 <= len(s); i += 8 {
 		x := binary.LittleEndian.Uint64(s[i:])
-		count += Count64(x)
+		count += uint64(bits.OnesCount64(x))
 	}
 
 	s = s[len(s)&^7:]
@@ -33,6 +36,6 @@ func countBytesGo(s []byte) (count uint64) {
 		left = left<<8 | uint64(s[0])
 	}
 
-	count += Count64(left)
+	count += uint64(bits.OnesCount64(left))
 	return
 }
