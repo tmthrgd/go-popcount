@@ -104,3 +104,9 @@ func BenchmarkCountSlice64Go(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkCount64(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		_ = Count64(^uint64(0))
+	}
+}
