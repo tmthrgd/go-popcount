@@ -8,6 +8,7 @@
 package popcount
 
 import (
+	"encoding/binary"
 	"math/bits"
 	"runtime"
 	"unsafe"
@@ -24,26 +25,22 @@ func countBytesGo(s []byte) (count uint64) {
 
 	// Align to 8 byte boundary
 	if x := 8 - int(uintptr(unsafe.Pointer(&s[0]))&7); !supportsUnaligned && x != 8 {
-		var left uint64
-
 		if x >= 4 {
-			left = uint64(s[3])<<24 | uint64(s[2])<<16 | uint64(s[1])<<8 | uint64(s[0])
+			count += uint64(bits.OnesCount32(binary.LittleEndian.Uint32(s)))
 			s = s[4:]
 			x -= 4
 		}
 
 		if x >= 2 {
-			left = left<<16 | uint64(s[1])<<8 | uint64(s[0])
+			count += uint64(bits.OnesCount16(binary.LittleEndian.Uint16(s)))
 			s = s[2:]
 			x -= 2
 		}
 
 		if x == 1 {
-			left = left<<8 | uint64(s[0])
+			count += uint64(bits.OnesCount8(s[0]))
 			s = s[1:]
 		}
-
-		count = uint64(bits.OnesCount64(left))
 
 		if len(s) < 8 {
 			goto tail
@@ -58,22 +55,19 @@ func countBytesGo(s []byte) (count uint64) {
 	s = s[len(s)&^7:]
 
 tail:
-	var left uint64
-
 	if len(s) >= 4 {
-		left = uint64(s[3])<<24 | uint64(s[2])<<16 | uint64(s[1])<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount32(binary.LittleEndian.Uint32(s)))
 		s = s[4:]
 	}
 
 	if len(s) >= 2 {
-		left = left<<16 | uint64(s[1])<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount16(binary.LittleEndian.Uint16(s)))
 		s = s[2:]
 	}
 
 	if len(s) == 1 {
-		left = left<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount8(s[0]))
 	}
 
-	count += uint64(bits.OnesCount64(left))
 	return
 }

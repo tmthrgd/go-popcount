@@ -20,22 +20,19 @@ func countBytesGo(s []byte) (count uint64) {
 
 	s = s[len(s)&^7:]
 
-	var left uint64
-
 	if len(s) >= 4 {
-		left = uint64(s[3])<<24 | uint64(s[2])<<16 | uint64(s[1])<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount32(binary.LittleEndian.Uint32(s)))
 		s = s[4:]
 	}
 
 	if len(s) >= 2 {
-		left = left<<16 | uint64(s[1])<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount16(binary.LittleEndian.Uint16(s)))
 		s = s[2:]
 	}
 
 	if len(s) == 1 {
-		left = left<<8 | uint64(s[0])
+		count += uint64(bits.OnesCount8(s[0]))
 	}
 
-	count += uint64(bits.OnesCount64(left))
 	return
 }
