@@ -37,8 +37,6 @@ func CountSlice64(s []uint64) uint64 {
 	return countBytesASM((*byte)(unsafe.Pointer(&s[0])), uint64(len(s)*8))
 }
 
-//go:generate go run asm_gen.go
-
 // This function is implemented in popcnt_amd64.s
 //go:noescape
 func hasPOPCNT() (ret bool)

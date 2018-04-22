@@ -9,6 +9,15 @@
 
 #include "textflag.h"
 
+// Important performance information can be found at:
+// http://stackoverflow.com/a/25089720
+//
+// POPCNT has a false-dependency bug that causes a performance
+// hit. Thus, in bigloop four separate destination registers are
+// used to allow intra-loop parallelization, and in loop the
+// destination register is cleared (with no practical effect)
+// before POPCNT to allow inter-loop parallelization.
+
 TEXT ·countBytesASM(SB),NOSPLIT,$0
 	MOVQ src+0(FP), SI
 	MOVQ len+8(FP), BX
